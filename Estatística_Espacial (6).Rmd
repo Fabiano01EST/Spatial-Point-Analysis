@@ -1,0 +1,358 @@
+---
+title: "UNIVERSIDADE ESTADUAL DA PARAÍBA CAMPUS l CENTRO DE CIÊNCIAS E TECNOLOGIA DEPARTAMENTO DE ESTATÍSTICA CURSO DE ESTATÍSTICA"
+institute: 
+     - "Ánalise Espacial - Densidade Demográfica do Estado do Rio Grande do Norte"
+author: 
+     - "Fabiano Florentino dos Santos" 
+     - "Prof. Ricardo Alves de Olinda "
+date: "CAMPINA GRANDE 23/09/24"
+encoding: "UTF-8"
+header-includes:
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightLines: true #realçar as linhas
+      countIncrementalSlides: false
+    css: ["chocolate-fonts" , "tamu"]
+editor_options: 
+  chunk_output_type: console
+---
+### Pequena introdução do que é processos pontuais
+
+-  os fenômenos expressos através de ocorrências identificadas como pontos localizados no espaço, denominados processos pontuais. São exemplos como: 
+ - localização de crimes; 
+ - ocorrências de doenças;
+ - localização de espécies vegetais. 
+
+- O objetivo é estudar a distribuição espacial destes pontos, testando hipóteses se é aleatório, se apresentase em aglomerados ou se os pontos estão regularmente distribuídos. O objeto de interesse é a própria localização espacial dos eventos em estudo
+
+- O tipo de dado consiste em uma série de coordenadas de pontos (p1, p2, ...) dos eventos na área de estudo. O  evento refere-se a qualquer fenômeno localizável no espaço que tenha umrepresentação pontual (Câmara, Cavalho, 1996).
+
+---
+
+- A análise de padrões neste tipo de dado podemos indentificar várias causa e concentrações nos dados, se estamaos trabalhando com dados de mortalidade, pode ser utilizada como uma forma de identificação de possíveis áreas com maior concentração de mortes, de comparação entre os óbitos nos dois grupos de idade, e de identificação de fatores de risco associados a esta ocorrência.
+
+
+$Obs)_1$ Os pontos em geral não estão associados a valores, mas apenas à ocorrência
+dos eventos considerados.
+
+$Obs)_2$ Em alguns estudos os pontos podem estar associados a atributos de
+identificação.
+
+- Um processo de dados pontuais possui efeitos de primeira segunda e ordem, neste caso, temos intensidade do processo, isto é, no número de eventos por unidade de área. Já em relação a efeitos de segunda ordem, denominados locais ou de pequena escala, representam a dependência espacial no processo, proveniente da correlação espacial. 
+
+
+---
+###Estimador de Intensidade ("Kernel Estimation")
+
+ Esta função realiza uma contagem de todos os pontos dentro de uma região de influência, ponderando-os pela distância de cada um à localização de interesse
+
+
+A fórmula apresentada é a seguinte:
+
+$$\hat{\lambda}_\tau(u) = \frac{1}{\tau^2} \sum_{i=1}^{n} k \left( \frac{d(u_i, u)}{\tau} \right), \quad d(u_i, u) \leq \tau, \quad onde:$$
+- $\hat{\lambda}_\tau(u)$ é o estimador da densidade (ou intensidade) no ponto $u$, ajustado pelo parâmetro $\tau$, que controla a vizinhança do ponto;
+
+-  $\tau$ é o raio, que define o tamanho da vizinhança ao redor do ponto $u$ onde as observações $u_i$ serão consideradas;
+
+-  $n$ é o número total de observações, com $u_1, u_2, \dots, u_n$ representando os pontos observados (eventos) no conjunto de dados;
+
+- $k(\cdot)$ é a função kernel, que atribui pesos às distâncias $d(u_i, u)$ entre os pontos observados $u_i$ e o ponto de interesse $u$. A função kernel pode variar de acordo com a aplicação, normalmente a usa-se a função gaussiana ou demais funções.
+
+---
+
+- $d(u_i, u)$ é a métrica de distância entre o ponto observado $u_i$ e o ponto de interesse $u$. A distância pode ser euclidiana ou outra métrica apropriada, dependendo do contexto do problema;
+
+- A condição $d(u_i, u) \leq \tau$ garante que somente os pontos $u_i$ que estão dentro da vizinhança definida por $\tau$ ao redor de $u$ sejam considerados no cálculo da densidade.
+
+
+fazendo uso da função $k(h) = \frac{1}{2\pi}\exp{(\frac{h^2}{2\pi^2})}$, a função de intensidade de kenel pode ser expressa como: $$\hat{\lambda}_\tau(u) =\sum_{h_i \leq \tau}^{} \frac{3}{\pi\tau^2} \left( \frac{1-h_{i}^2}{\tau^2} \right)$$
+---
+
+###Estimadores de Dependência Espacial - (Vizinho Mais Próximo)
+
+Dentre as principais tecnicas temos o método do Vizinho Mais Próximo onde estimos a função de distribuição cumulativa $\hat G(h)$ baseado nas distâncias h entre eventos em uma região de análise
+
+
+A fórmula pode ser expressa por:
+
+$$\hat{G}(h) = \frac{\#(d(u_i, u_j) \leq h)}{n}$$
+- $\hat{G}(h)$: É estimativa para o valor de $G$ em uma distância $h$. Representa a função empírica de distribuição ou uma função relacionada à densidade de pontos.
+    
+- $\#(d(u_i, u_j) \leq h)$: denota a  contagem de pares de pontos $u_i$ e $u_j$ cuja distância $d(u_i, u_j)$ é menor ou igual a $h$. Em outras palavras, conta quantos pares de pontos estão a uma distância menor ou igual a $h$.
+    
+- $d(u_i, u_j)$: A função $d(\cdot)$ representa uma medida de distância entre dois pontos $u_i$ e $u_j$. A distância pode ser euclidiana ou outra métrica espacial.
+    
+- $h$: Um parâmetro de distância, que pode variar para calcular o número de pares de pontos que estão a uma distância inferior ou igual a $h$. Dependendo do contexto, $h$ pode ser interpretado como um raio ou intervalo de distância.
+
+---  
+
+- $n$: O número total de pontos ou o número total de possíveis pares avaliados. Neste caso, ele representa o denominador que normaliza a contagem, fornecendo uma proporção.
+
+$Obs)_1$ A plotagem dos resultados desta função de distribuição cumulativa empírica $\hat G(h)$ pode ser  para se verificar se existe evidência de interação entre os eventos. 
+
+$Obs)_2$ O método de análise de vizinhança pode ser usada para se comparar estatísticamente a distribuição dos eventos observados com o que se esperaria na hipótese da aleatoriedade espacial completa (CSR). Para verificar a condição de aleatoriedade, calculamos os envelopes de simulação superior e inferior. 
+
+$Obs)_3$ o método do vizinho mais próximo fornece uma indicação inicial da distribuição espacial, tem a desvantagem por considera apenas escalas pequenas. Para se ter informação mais efetiva para o padrão espacial em escalas maiores, pode ser recomendado usar é o métdo da função K
+
+---
+
+###Estimadores de Dependência Espacial - (função K)
+
+A função K, também conhecida como medida de momento de segunda ordem
+reduzido, pode ser expressa na forma de:
+
+
+$$\lambda K(h) = E( \text{#eventos contidos a uma distância h de um evento arbitrário})$$
+temos a estimativa de $K(h)$, onde:
+
+
+$$\hat{K}(h) = \frac{A}{n^2} \sum_{i=1}^{n} \sum_{\substack{j=1 \\ j \neq i}}^{n} \frac{I_h(d_{ij})}{w_{ij}}$$
+
+- $A$: Representa a área da região onde o processo está sendo estudado.
+    
+- $n$: O número total de pontos observados na região de interesse.
+    
+- $\sum_{i=1}^{n} \sum_{\substack{j=1 \\ j \neq i}}^{n}$: Dupla soma que percorre todos os pares de pontos $(i, j)$, onde $i \neq j$. Isso significa que estamos somando sobre todos os pares de pontos distintos.
+    
+- $I_h(d_{ij})$: Uma função indicadora, onde $I_h(d_{ij}) = 1$ se a distância entre os pontos $i$ e $j$, representada por $d_{ij}$, for menor ou igual a $h$; caso contrário, $I_h(d_{ij}) = 0$.
+    
+- $d_{ij}$: A distância entre o ponto $i$ e o ponto $j$. 
+ 
+---    
+- $w_{ij}$: Um fator de ponderação que pode depender da geometria da região ou de outros ajustes estatísticos.
+
+
+$Obs)_1$ A função K é usada como ferramenta exploratória na comparação entre
+estimativa empírica — $\hat K(h)$ — e a resultante de um processo de padrão de pontos
+espacial aleatório — $K(h)$, sendo que se estamos completamente aleátorio $K(h) = h\pi^2$
+
+
+$Obs)_2$ uma forma de comparar a estimativa K de um conjunto de dados observados com $h\pi^2$ seria plotar a função $\hat L(h)$ definida como $\hat L(h) = \sqrt\frac{\hat K(h)-h}{\pi}$. A abordagem é similar à do vizinho mais próximo, pode ser feita para se estimar a significância dos desvios da distribuição $\hat L(h)$ em relação à condição de aleatoriedade (CSR)
+
+
+
+---
+###Vamos carregar os principais pacotes que serão usados para análise espacial 
+```{r, include=T, menssage = F, warning=F, echo = T}
+#pacotes a serejm estalados
+suppressPackageStartupMessages(library(readxl)) #pacote usado para leitura de tabelas 
+suppressPackageStartupMessages(library(dplyr)) #pacote usado para manipulações de tabelas 
+suppressPackageStartupMessages(library(geobr)) # consegue os dados do shapefile mais falcimente
+suppressPackageStartupMessages(library(ggplot2)) # cria os gráficos mais tecnicos e estilosos
+suppressPackageStartupMessages(require(spatstat)) # Análise de dados em processos pontuais
+suppressPackageStartupMessages(library(sf)) #função para ler tipos de shapefiles
+suppressPackageStartupMessages(library(mapproj))
+suppressPackageStartupMessages(library(rnaturalearth))
+#devtools::install_github("AndySouth/rnaturalearthhires")
+suppressPackageStartupMessages(library(rnaturalearthhires))
+suppressPackageStartupMessages(library(kableExtra))
+```
+---
+###Carregando dados de Queimada no Rio Grande do Norte
+
+
+- O banco contem variáveis como Horas, Munícipio, Bioma, Satelite, Dias sem chuva, Precipitação, Risco de fogo, Latitude, Longitude e FRP se refere a Fire Radiative Power (Potência Radiativa do Fogo)
+
+```{r, include=T, menssage = F, warning=F, echo = F}
+# Ler os dados do arquivo Excel
+dados_shape_RN_BDqueimadas = read.csv("C://Users//samsung//Documents//R-Studio//focos_qmd_inpe_2023-11-30_2024-10-01_08.627347.csv", fileEncoding = "UTF-8")
+
+kable(dados_shape_RN_BDqueimadas, format = "html", caption = "Dados de queimadas do Rio Grande do Norte") %>% kable_styling(
+    bootstrap_options = c("striped", "hover"), font_size = 12, full_width = F, position = "center") %>%
+  scroll_box(width = "100%", height = "400px") # Ajustar o tamanho da visualização
+```
+---
+Vamos optar por analisar a variável FRP no intervalo de tempo de 01/12/2023 até 29/09/2024, algumas medidas resumo 
+```{r, include=T, menssage = F, warning=F, echo=F}
+suppressPackageStartupMessages(library(psych))
+
+# Supondo que Shape_RN$densidade_demografica seja o vetor de dados para análise
+AD <- describe(dados_shape_RN_BDqueimadas$FRP)
+
+# Renomeando as colunas do dataframe AD
+AD$Variável <- AD$vars
+AD$Média <- AD$mean
+AD$Variância <- AD$sd
+AD$Mediana <- AD$median
+AD$Média_Truq <- AD$trimmed
+AD$Kurtose <- AD$kurtosis
+AD$Intervalo <- AD$range
+AD$Coef_assim <- AD$skew
+AD$Desv_abs <- AD$mad
+AD$Erro_padrao <- AD$se
+
+AD_df <- AD[, c("Variável", "Média", "Variância", "Mediana", "Média_Truq", "Kurtose", "Intervalo", "Coef_assim", "Desv_abs", "Erro_padrao")]
+AD_df_transposed <- as.data.frame(t(AD_df))
+knitr::kable(AD_df_transposed, caption = "Medidas resumo da variavel FRS")
+```
+---
+```{r, include=T, menssage = T, echo=F, menssage = F, warning=FALSE, out.width="100%", out.height = "100%",fig.width=15, fig.height=10,  fig.align = 'center'}
+hist(dados_shape_RN_BDqueimadas$FRP, 
+     main = "Histograma da variável FRS", 
+     xlab = "Valores", 
+     ylab = "Frequência", 
+     col = "lightblue", 
+     border = "black")
+lines(density(dados_shape_RN_BDqueimadas$FRP), col = "red", lwd = 1)
+```
+---
+```{r, include=T, menssage = T, echo=F, menssage = F, warning=FALSE, out.width="100%", out.height = "100%",fig.width=15, fig.height=10,  fig.align = 'center'}
+# Obter dados de municípios do Rio Grande do Norte
+municipios_rn <- read_municipality(code_muni = "RN", year = 2022)
+
+dados_shape_RN_BDqueimadas1 = dados_shape_RN_BDqueimadas[, c(6,10,11,12)]
+
+
+# Gráfico 1: Municípios do Rio Grande do Norte
+ggplot(data = municipios_rn) +
+  geom_sf(fill = "lightgreen", color = "black") +  # Municípios em azul claro
+  geom_point(data = dados_shape_RN_BDqueimadas1, 
+             aes(x = Longitude, y = Latitude, color = Bioma), 
+             size = 3, alpha = 0.6) +  # Dados de queimadas
+  labs(title = "Municípios do Rio Grande do Norte Dados de Queimadas",
+       subtitle = "Anos: 2023-2024",
+       x = "Longitude",
+       y = "Latitude") +
+  theme_minimal()
+```
+---
+```{r, include=T, menssage = T, echo=F, menssage = F, warning=FALSE, out.width="100%", out.height = "100%",fig.width=15, fig.height=10,  fig.align = 'center'}
+
+# 2. Obter dados das mesorregiões do Brasil
+mesorregioes <- read_meso_region(year = 2020)
+# 3. Filtrar mesorregiões para o Rio Grande do Norte
+mesorregioes_rn <- mesorregioes[mesorregioes$abbrev_state == "RN", ]  
+
+# Gráfico 2: Mesorregiões do Rio Grande do Norte
+ggplot(mesorregioes_rn) +
+  geom_sf(fill = "lightgreen", color = "black") +  # Mesorregiões em vermelho
+  geom_point(data = dados_shape_RN_BDqueimadas1, 
+             aes(x = Longitude, y = Latitude, color = Bioma), 
+             size = 3, alpha = 0.6)+
+  labs(title = "Mesorregiões do Rio Grande do Norte - Dados de Queimadas",
+       subtitle = "Anos: 2023-2024",
+       x = "Longitude",
+       y = "Latitude") +
+  theme_minimal()
+```
+---
+###Estimando a intensidade de Pontos
+```{r, include=T, menssage = T}
+#Estimando a intensidade de pontos(lambda)
+attach(dados_shape_RN_BDqueimadas1)
+summary(dados_shape_RN_BDqueimadas1)
+Queimadas <- ppp(Longitude, Latitude,  c(-38.7,-35), c(-6.91206,-4.83379))
+plot(Queimadas)
+```
+---
+```{r, include=T, menssage = F}
+lamb <- summary(Queimadas)$intensity
+lamb
+```
+---
+```{r, include=T, menssage = F}
+# Teste de Kolmogorov-Smirnov para completa aleatoriedade 
+#  espacial com com a coordenada x
+KS <- cdf.test(Queimadas, "x",test="ks")
+plot(KS,main="Teste de Kolmogorov-Smirnov para Completa 
+         Aleatoriedade Espacial")
+pval <- KS$p.value; pval
+KS
+#savePlot('Fig4.png',type="png")
+```
+---
+
+```{r, include=T, menssage = F}
+# Teste de Cramer-Von Mises para completa aleatoriedade espacial com 
+# com a coordenada x
+
+CVM <- cdf.test(Queimadas, "x", test="cvm")
+plot(CVM,main="Teste de Cramer-Von Mises para Completa 
+      Aleatoriedade Espacial")
+pval <- CVM$p.value
+pval
+CVM
+
+#savePlot('Fig5.png',type="png")
+
+# Um poss?vel modelo para um processo de poisson n?o-homeg?neo
+# Lembrando que, apenas como exemplo, pois, neste caso, o banco 
+# de dados segue um comportamento da CAE, ou seja, n?o rejeitamos
+# a hip?tese nula da CAE.
+
+```
+---
+```{r, include=T, menssage = F}
+#Ajuste da distribuição G
+
+r <- seq(0,0.16,length=1000)
+G <- envelope(Queimadas, Gest, nsim = 999, r=r,correction="border")
+plot(G, main = "Envelope da função G",xlab="Distãncia (quilometros)", 
+     ylab="G(y)", xlim=c(0,0.13), ylim=c(0.0,1.1))
+plot(G$r, G$theo, main = "Envelope da função G",type="n",
+     xlab="Distãncia (quilometros)", ylab="G(y)",  
+     xlim=c(0,0.13), ylim=c(0.0,1.1))
+lines(G$r, G$theo,lty=3,col="blue")
+lines(G$r, G$hi, lty=2,col="red")
+lines(G$r, G$lo, lty=2,col="red") 
+lines(G$r,G$obs,lty=1, col="black")
+
+
+legend("bottomright", c("Distribuição Teórica","Distribuição Empírica",
+                        "Envelope Simulado"), pch=7, col=c("blue","black","red"))
+
+```
+---
+```{r, include=T, menssage = F}
+
+#title("Ajuste do variograma com diferentes função de correlação")
+#savePlot('Fig6.png',type="png")
+
+#Ajuste da distribuição K
+
+#ylim=c(0.0,0.28)
+#, xlim=c(0,0.16)
+#,  xlim=c(0,0.16), ylim=c(0.0,0.28)
+
+r <- seq(0,0.16,length=1000)
+L <- envelope(Queimadas, Lest, nsim = 999, r=r,correction="border")
+plot(L, main = "Envelope da função K",xlab="Distãncia (quilometros)", ylab="K(y)")
+plot(L$r, L$theo, main = "Envelope da função K",type="n",
+     xlab="Distãncia (quilimetros)", ylab="K(y)",xlim=c(0,0.16),ylim=c(0,0.20))
+lines(L$r, L$theo,lty=3, col="blue")
+lines(L$r, L$hi,  lty=2, col="red")
+lines(L$r, L$lo,  lty=2, col="red") 
+lines(L$r, L$obs, lty=1, col="black")
+
+#savePlot('Fig7.png',type="png")
+```
+---
+
+```{r, include=T, menssage = F}
+#Ajuste da Distribuição F
+
+#ylim=c(0.0,0.28)
+#, xlim=c(0,0.16)
+#,  xlim=c(0,0.16), ylim=c(0.0,0.28)
+
+r <- seq(0,0.16,length=1000)
+F <- envelope(Queimadas, Fest, nsim = 1000, r=r,correction="border")
+plot(F, main = "Envelope da função F",xlab="Distãncia (quilometros)", ylab="K(y)")
+plot(F$r, F$theo, main = "Envelope da função F",type="n",xlab="Distãncia (quilometros)", ylab="K(y)")
+lines(F$r, F$theo,lty=3,col="blue")
+lines(F$r, F$hi, lty=2,col="red")
+lines(F$r, F$lo, lty=2,col="red") 
+lines(F$r,F$obs,lty=1, col="black")
+```
+---
+###Conclusão
+
+
+
+---
+
+###Referências
+
+

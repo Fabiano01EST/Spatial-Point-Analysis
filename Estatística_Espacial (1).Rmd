@@ -1,0 +1,611 @@
+---
+title: "UNIVERSIDADE ESTADUAL DA PARAÍBA CAMPUS l CENTRO DE CIÊNCIAS E TECNOLOGIA DEPARTAMENTO DE ESTATÍSTICA CURSO DE ESTATÍSTICA"
+institute: 
+     - "Ánalise Espacial - Densidade Demográfica do Estado do Rio Grande do Norte"
+author: 
+     - "Fabiano Florentino dos Santos" 
+     - "Prof. Ricardo Alves de Olinda "
+date: '`r Sys.Date()`'
+encoding: "UTF-8"
+header-includes:
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightLines: true #realçar as linhas
+      countIncrementalSlides: false
+    css: ["chocolate-fonts" , "tamu"]
+editor_options: 
+  chunk_output_type: console
+---
+### Pequena introdução do que é processos pontuais
+
+-  os fenômenos expressos através de ocorrências identificadas como pontos localizados no espaço, denominados processos pontuais. São exemplos como: 
+ - localização de crimes; 
+ - ocorrências de doenças;
+ - localização de espécies vegetais. 
+
+- O objetivo é estudar a distribuição espacial destes pontos, testando hipóteses se é aleatório, se apresentase em aglomerados ou se os pontos estão regularmente distribuídos. O objeto de interesse é a própria localização espacial dos eventos em estudo
+
+- O tipo de dado consiste em uma série de coordenadas de pontos (p1, p2, ...) dos eventos na área de estudo. O  evento refere-se a qualquer fenômeno localizável no espaço que tenha umrepresentação pontual (Câmara, Cavalho, 1996).
+
+---
+
+- A análise de padrões neste tipo de dado podemos indentificar várias causa e concentrações nos dados, se estamaos trabalhando com dados de mortalidade, pode ser utilizada como uma forma de identificação de possíveis áreas com maior concentração de mortes, de comparação entre os óbitos nos dois grupos de idade, e de identificação de fatores de risco associados a esta ocorrência.
+
+
+$Obs)_1$ Os pontos em geral não estão associados a valores, mas apenas à ocorrência
+dos eventos considerados.
+
+$Obs)_2$ Em alguns estudos os pontos podem estar associados a atributos de
+identificação.
+
+- Um processo de dados pontuais possui efeitos de primeira segunda e ordem, neste caso, temos intensidade do processo, isto é, no número de eventos por unidade de área. Já em relação a efeitos de segunda ordem, denominados locais ou de pequena escala, representam a dependência espacial no processo, proveniente da correlação espacial. 
+
+
+---
+###Estimador de Intensidade ("Kernel Estimation")
+
+ Esta função realiza uma contagem de todos os pontos dentro de uma região de influência, ponderando-os pela distância de cada um à localização de interesse
+
+
+A fórmula apresentada é a seguinte:
+
+$$\hat{\lambda}_\tau(u) = \frac{1}{\tau^2} \sum_{i=1}^{n} k \left( \frac{d(u_i, u)}{\tau} \right), \quad d(u_i, u) \leq \tau, \quad onde:$$
+- $\hat{\lambda}_\tau(u)$ é o estimador da densidade (ou intensidade) no ponto $u$, ajustado pelo parâmetro $\tau$, que controla a vizinhança do ponto;
+
+-  $\tau$ é o raio, que define o tamanho da vizinhança ao redor do ponto $u$ onde as observações $u_i$ serão consideradas;
+
+-  $n$ é o número total de observações, com $u_1, u_2, \dots, u_n$ representando os pontos observados (eventos) no conjunto de dados;
+
+- $k(\cdot)$ é a função kernel, que atribui pesos às distâncias $d(u_i, u)$ entre os pontos observados $u_i$ e o ponto de interesse $u$. A função kernel pode variar de acordo com a aplicação, normalmente a usa-se a função gaussiana ou demais funções.
+
+---
+
+- $d(u_i, u)$ é a métrica de distância entre o ponto observado $u_i$ e o ponto de interesse $u$. A distância pode ser euclidiana ou outra métrica apropriada, dependendo do contexto do problema;
+
+- A condição $d(u_i, u) \leq \tau$ garante que somente os pontos $u_i$ que estão dentro da vizinhança definida por $\tau$ ao redor de $u$ sejam considerados no cálculo da densidade.
+
+
+fazendo uso da função $k(h) = \frac{1}{2\pi}\exp{(\frac{h^2}{2\pi^2})}$, a função de intensidade de kernel pode ser expressa como: $$\hat{\lambda}_\tau(u) =\sum_{h_i \leq \tau}^{} \frac{3}{\pi\tau^2} \left( \frac{1-h_{i}^2}{\tau^2} \right)$$
+---
+
+###Estimadores de Dependência Espacial - (Vizinho Mais Próximo)
+
+Dentre as principais tecnicas temos o método do Vizinho Mais Próximo onde estimos a função de distribuição cumulativa $\hat G(h)$ baseado nas distâncias h entre eventos em uma região de análise
+
+
+A fórmula pode ser expressa por:
+
+$$\hat{G}(h) = \frac{\#(d(u_i, u_j) \leq h)}{n}$$
+- $\hat{G}(h)$: É estimativa para o valor de $G$ em uma distância $h$. Representa a função empírica de distribuição ou uma função relacionada à densidade de pontos.
+    
+- $\#(d(u_i, u_j) \leq h)$: denota a  contagem de pares de pontos $u_i$ e $u_j$ cuja distância $d(u_i, u_j)$ é menor ou igual a $h$. Em outras palavras, conta quantos pares de pontos estão a uma distância menor ou igual a $h$.
+    
+- $d(u_i, u_j)$: A função $d(\cdot)$ representa uma medida de distância entre dois pontos $u_i$ e $u_j$. A distância pode ser euclidiana ou outra métrica espacial.
+    
+- $h$: Um parâmetro de distância, que pode variar para calcular o número de pares de pontos que estão a uma distância inferior ou igual a $h$. Dependendo do contexto, $h$ pode ser interpretado como um raio ou intervalo de distância.
+
+---  
+
+- $n$: O número total de pontos ou o número total de possíveis pares avaliados. Neste caso, ele representa o denominador que normaliza a contagem, fornecendo uma proporção.
+
+$Obs)_1$ A plotagem dos resultados desta função de distribuição cumulativa empírica $\hat G(h)$ pode ser  para se verificar se existe evidência de interação entre os eventos. 
+
+$Obs)_2$ O método de análise de vizinhança pode ser usada para se comparar estatísticamente a distribuição dos eventos observados com o que se esperaria na hipótese da aleatoriedade espacial completa (CSR). Para verificar a condição de aleatoriedade, calculamos os envelopes de simulação superior e inferior. 
+
+$Obs)_3$ o método do vizinho mais próximo fornece uma indicação inicial da distribuição espacial, tem a desvantagem por considera apenas escalas pequenas. Para se ter informação mais efetiva para o padrão espacial em escalas maiores, pode ser recomendado usar é o métdo da função K
+
+---
+
+###Estimadores de Dependência Espacial - (função K)
+
+A função K, também conhecida como medida de momento de segunda ordem
+reduzido, pode ser expressa na forma de:
+
+
+$$\lambda K(h) = E( \text{#eventos contidos a uma distância h de um evento arbitrário})$$
+temos a estimativa de $K(h)$, onde:
+
+
+$$\hat{K}(h) = \frac{A}{n^2} \sum_{i=1}^{n} \sum_{\substack{j=1 \\ j \neq i}}^{n} \frac{I_h(d_{ij})}{w_{ij}}$$
+
+- $A$: Representa a área da região onde o processo está sendo estudado.
+    
+- $n$: O número total de pontos observados na região de interesse.
+    
+- $\sum_{i=1}^{n} \sum_{\substack{j,  j \neq i}}^{n}$: Dupla soma que percorre todos os pares de pontos $(i, j)$, onde $i \neq j$. Isso significa que estamos somando sobre todos os pares de pontos distintos.
+    
+- $I_h(d_{ij})$: Uma função indicadora, onde $I_h(d_{ij}) = 1$ se a distância entre os pontos $i$ e $j$, representada por $d_{ij}$, for menor ou igual a $h$; caso contrário, $I_h(d_{ij}) = 0$.
+    
+- $d_{ij}$: A distância entre o ponto $i$ e o ponto $j$. 
+ 
+---    
+- $w_{ij}$: Um fator de ponderação que pode depender da geometria da região ou de outros ajustes estatísticos.
+
+
+$Obs)_1$ A função K é usada como ferramenta exploratória na comparação entre
+estimativa empírica — $\hat K(h)$ — e a resultante de um processo de padrão de pontos
+espacial aleatório — $K(h)$, sendo que se estamos completamente aleátorio $K(h) = h\pi^2$
+
+
+$Obs)_2$ uma forma de comparar a estimativa K de um conjunto de dados observados com $h\pi^2$ seria plotar a função $\hat L(h)$ definida como $\hat L(h) = \sqrt\frac{\hat K(h)-h}{\pi}$. A abordagem é similar à do vizinho mais próximo, pode ser feita para se estimar a significância dos desvios da distribuição $\hat L(h)$ em relação à condição de aleatoriedade (CSR)
+
+---
+###Vamos carregar os principais pacotes que serão usados para análise espacial 
+```{r, include=T, menssage = F, warning=F, echo = T}
+#pacotes a serejm estalados
+suppressPackageStartupMessages(library(readxl)) #pacote usado para leitura de tabelas 
+suppressPackageStartupMessages(library(dplyr)) #pacote usado para manipulações de tabelas 
+suppressPackageStartupMessages(library(geobr)) # consegue os dados do shapefile mais falcimente
+suppressPackageStartupMessages(library(ggplot2)) # cria os gráficos mais tecnicos e estilosos
+suppressPackageStartupMessages(require(spatstat)) # Análise de dados em processos pontuais
+suppressPackageStartupMessages(library(sf)) #função para ler tipos de shapefiles
+suppressPackageStartupMessages(library(mapproj))
+#suppressPackageStartupMessages(library(rnaturalearth))
+#devtools::install_github("AndySouth/rnaturalearthhires")
+#suppressPackageStartupMessages(library(rnaturalearthhires))
+suppressPackageStartupMessages(library(kableExtra))
+library(ggspatial) #pacotes necessários para adicionar escala e rosas dos ventos
+library(cowplot)
+
+```
+---
+###Carregando dados de Queimada no Rio Grande do Norte
+
+
+- O banco contem variáveis como Horas, Munícipio, Bioma, Satelite, Dias sem chuva, Precipitação, Risco de fogo, Latitude, Longitude e FRP se refere a Fire Radiative Power (Potência Radiativa do Fogo em megawatts (MW))
+
+```{r, include=T, menssage = F, warning=F, echo = F}
+# Ler os dados do arquivo Excel
+dados_shape_RN_BDqueimadas = read.csv("C://Users//samsung//Documents//R-Studio//focos_qmd_inpe_2023-11-30_2024-10-01_08.627347.csv", fileEncoding = "UTF-8")
+
+kable(dados_shape_RN_BDqueimadas, format = "html", caption = "Dados de queimadas do Rio Grande do Norte") %>% kable_styling(
+    bootstrap_options = c("striped", "hover"), font_size = 12, full_width = F, position = "center") %>%
+  scroll_box(width = "100%", height = "400px") # Ajustar o tamanho da visualização
+```
+---
+Vamos optar por analisar a variável FRP no intervalo de tempo de 01/12/2023 até 29/09/2024, algumas medidas resumo 
+```{r, include=T, menssage = F, warning=F, echo=F}
+suppressPackageStartupMessages(library(psych))
+
+AD <- describe(dados_shape_RN_BDqueimadas[, c(8,9,12)]); AD = t(AD[,-c(1,2)])
+rownames(AD) <- c("Média", "Desvio padrão", "Mediana", "Média Truncada - Corte10%","Desvio absoluto mediano", "Mínimo","Máximo","Amplitude",  "Coef. Assimétria", "Kurtose","Erro padrao")
+AD_df_transposed <- as.data.frame(AD) %>%  round(2)
+knitr::kable(AD_df_transposed, caption = "Medidas resumo da variavel FRS")
+```
+---
+```{r, include=T, echo=F, menssage = F, warning=FALSE, out.width="100%", out.height = "100%", fig.width=15, fig.height=10, fig.align = 'center'}
+attach(dados_shape_RN_BDqueimadas)
+
+
+j1 = ggplot(dados_shape_RN_BDqueimadas) +
+  aes(x = dados_shape_RN_BDqueimadas$Bioma, y = dados_shape_RN_BDqueimadas$FRP, fill = dados_shape_RN_BDqueimadas$Bioma, color = dados_shape_RN_BDqueimadas$Messoregião)+
+  xlab("biomas")+ ylab("Potência Radiativa do Fogo em megawatt s(MW)")+
+  geom_boxplot(width = 0.7 , show.legend = F) +
+  geom_jitter(position = position_jitter(0.2), show.legend = F)+
+  labs(title = "Distribuição via boxplot", subtitle = "Potência Radiativa do Fogo por bioma" ) +
+  theme_bw(base_size = 20)
+
+j2 = ggplot(dados_shape_RN_BDqueimadas) +
+  aes(x = dados_shape_RN_BDqueimadas$Bioma, y = dados_shape_RN_BDqueimadas$Precipitacao, fill = dados_shape_RN_BDqueimadas$Bioma, color = dados_shape_RN_BDqueimadas$Messoregião)+
+  xlab("biomas")+ ylab("Precipitação em milimetros (mm)")+
+  geom_boxplot(width = 0.7 , show.legend = F) +
+  geom_jitter(position = position_jitter(0.2), show.legend = F)+
+  labs(title = "Distribuição via boxplot", subtitle = "Precipitação por bioma" ) +
+  theme_bw(base_size = 20)
+
+
+j3 = ggplot(dados_shape_RN_BDqueimadas) +
+  aes(x = dados_shape_RN_BDqueimadas$Bioma, y = dados_shape_RN_BDqueimadas$RiscoFogo, fill = dados_shape_RN_BDqueimadas$Bioma, color = dados_shape_RN_BDqueimadas$Messoregião)+
+  xlab("biomas")+ ylab("Risco de fogo")+
+  geom_boxplot(width = 0.7 , show.legend = F) +
+  geom_jitter(position = position_jitter(0.2), show.legend = F)+
+  labs(title = "Distribuição via boxplot", subtitle = "Risco de fogo por bioma" ) +
+  theme_bw(base_size = 20)
+
+gridExtra::grid.arrange(j1,j2,j3, nrow = 1, ncol = 3)
+```
+---
+```{r, include=T, echo=F, menssage = F, warning=FALSE, out.width="100%", out.height = "100%",fig.width=15, fig.height=10, fig.align = 'center'}
+
+quebras1 = pretty(range(dados_shape_RN_BDqueimadas$FRP), n = nclass.Sturges(dados_shape_RN_BDqueimadas$FRP))
+
+g1 = ggplot(dados_shape_RN_BDqueimadas, aes(x = dados_shape_RN_BDqueimadas$FRP)) +
+  ylab("DENSIDADE") + xlab("(Potência de Energia Liberada em megawatts (MW))") +
+  labs(title = "Distribuição via Histograma") +  
+  geom_histogram(aes(y = after_stat(density)), fill = "orange", color = "red" , breaks = quebras1) +
+  geom_density(col = "black", linewidth = 1) +
+  scale_x_continuous(limits = c(0,260), breaks = seq(0,260,20))+
+  theme(axis.text.x = element_text(hjust = 1, size = 12),
+        axis.title.y = element_text(size = 12), 
+        axis.title.x = element_text(size = 12))
+
+RiscoFogo_filtrado <- dados_shape_RN_BDqueimadas$RiscoFogo %>%
+  na.omit() %>%
+  subset(. >= 0 & . <= 1) %>%
+  as.numeric()
+
+quebras2 = pretty(range(RiscoFogo_filtrado), n = nclass.Sturges(RiscoFogo_filtrado))
+
+g2 = ggplot(data = data.frame(RiscoFogo_filtrado), aes(x = RiscoFogo_filtrado)) + ylab("DENSIDADE") + xlab("Risco de Fogo") +
+  labs(title = "Distribuição via Histograma") +  
+  geom_histogram(aes(y = after_stat(density)), fill = "orange", color = "red", breaks = quebras2) +
+  geom_density(col = "black", linewidth = 1) +
+  # scale_x_continuous(limits = c(0, 100), breaks = seq(0, 100, 10)) +  # Descomente se quiser definir os limites do eixo x
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.1)) +
+  theme(axis.text.x = element_text(hjust = 1, size = 12),
+    axis.title.y = element_text(size = 12), 
+    axis.title.x = element_text(size = 12))
+
+
+Precipitacao_filtrado <- dados_shape_RN_BDqueimadas$Precipitacao %>%
+  na.omit() %>%
+  subset(. >= 0 & . <= 1) %>%
+  as.numeric()
+
+quebras3 = pretty(range(Precipitacao_filtrado), n = nclass.Sturges(Precipitacao_filtrado))
+
+g3 = ggplot(data = data.frame(Precipitacao_filtrado), aes(x = Precipitacao_filtrado)) +
+  ylab("DENSIDADE") + xlab("Precipitação em milímetros (mm)") +
+  labs(title = "Distribuição via Histograma") +  
+  geom_histogram(aes(y = after_stat(density)), fill = "orange", color = "red" , breaks = quebras3) +
+  geom_density(col = "black", linewidth = 1) +
+  scale_x_continuous(limits = c(0,0.6), breaks = seq(0,0.6,0.05))+
+  theme(axis.text.x = element_text(hjust = 1, size = 12),
+        axis.title.y = element_text(size = 12),
+         axis.title.x = element_text(size = 12))
+
+gridExtra::grid.arrange(g1,g2,g3, ncol = 3, nrow =1)
+```
+---
+```{r, include=T, echo=F, menssage = F, warning=FALSE, out.width="100%", out.height = "100%", fig.width=15, fig.height=10, fig.align = 'center'}
+
+#quais os outlers da distribuição
+#boxplot.stats(dados_shape_RN_BDqueimadas$FRP)$out
+# Calcular os quartis e limites
+#quartis <- boxplot.stats(dados_shape_RN_BDqueimadas$FRP)
+
+FRP_filtrado <- dados_shape_RN_BDqueimadas$FRP %>%
+  na.omit() %>%
+  subset(. >= 0 & . <= 260) %>%
+  as.numeric()
+
+# Criar o data.frame com as colunas desejadas
+dados_FRP <- data.frame(
+  Estado = rep("RN", length(FRP_filtrado)),  # Repetir "RN" com o mesmo comprimento da precipitação filtrada
+  FRP  = FRP_filtrado
+)
+
+f1 = ggplot(dados_FRP) +
+  aes(y = dados_FRP$Estado, x = dados_FRP$FRP) +
+  ylab("")+ xlab("(Potência de Energia Liberada em megawatts (MW))") +
+  geom_boxplot(width = 0.7 , show.legend = F, fill = "orange", outlier.colour = "red", outlier.shape = 1) +
+  #geom_jitter(position = position_jitter(0), show.legend = F)+
+  labs(title = "Distribuição via Boxplot") +
+  scale_x_continuous(limits = c(0,260), breaks = seq(0,260,20))+
+  theme(axis.text.x = element_text(hjust = 1, size = 12),
+        axis.title.y = element_text(size = 12), 
+        axis.title.x = element_text(size = 12))
+  # # Adicionar linhas para os quartis na vertical
+  # geom_vline(xintercept = quartis$stats[2], linetype = "dashed", color = "blue") + # Q1
+  # geom_vline(xintercept = quartis$stats[3], linetype = "dashed", color = "blue") + # Mediana (Q2)
+  # geom_vline(xintercept = quartis$stats[4], linetype = "dashed", color = "blue") + # Q3
+  # geom_vline(xintercept = quartis$stats[1], linetype = "dashed", color = "blue") + # Limite superior
+  # geom_vline(xintercept = quartis$stats[5], linetype = "dashed", color = "blue") + # Limite inferior
+  # annotate("text", x = quartis$stats[2], y = 1, angle = 90, label = paste("Q1:", round(quartis$stats[2], 2)), angle = 90, color = "blue") +
+  # 
+  # annotate("text", x = quartis$stats[3], y = 1, angle = 90, label = paste("Mediana:", round(quartis$stats[3], 2)), color = "darkred") +
+  # 
+  # annotate("text", x = quartis$stats[4], y = 1, angle = 90, label = paste("Q3:", round(quartis$stats[4], 2)), angle = 90, color = "blue") +
+  # 
+  # annotate("text", x = quartis$stats[1], y = 1, angle = 90, label = paste("Limite Inferior:", round(quartis$stats[1], 2)), color = "blue") +
+  # 
+  # annotate("text", x = quartis$stats[5], y = 1, angle = 90, label = paste("Limite Superior:", round(quartis$stats[5], 2)), color = "blue")
+
+RiscoFogo_filtrado <- dados_shape_RN_BDqueimadas$RiscoFogo %>%
+  na.omit() %>%
+  subset(. >= 0 & . <= 1) %>%
+  as.numeric()
+
+# Criar o data.frame com as colunas desejadas
+dados_RiscoFogo <- data.frame(
+  Estado = rep("RN", length(RiscoFogo_filtrado)),  # Repetir "RN" com o mesmo comprimento da precipitação filtrada
+  RiscoFogo  = RiscoFogo_filtrado
+)
+
+f2 = ggplot(dados_RiscoFogo) +
+  aes(y = dados_RiscoFogo$Estado, x = dados_RiscoFogo$RiscoFogo) +
+  ylab("")+ xlab("Risco de Fogo") +
+  geom_boxplot(width = 0.7 , show.legend = F, fill = "orange", outlier.colour = "red", outlier.shape = 1) +
+  #geom_jitter(position = position_jitter(0), show.legend = F)+
+  labs(title = "Distribuição via Boxplot") +
+   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.1)) +
+  theme(axis.text.x = element_text(hjust = 1, size = 12),
+    axis.title.y = element_text(size = 12), 
+    axis.title.x = element_text(size = 12))
+
+Precipitacao_filtrado <- dados_shape_RN_BDqueimadas$Precipitacao %>%
+  na.omit() %>%
+  subset(. >= 0 & . <= 1) %>%
+  as.numeric()
+
+# Criar o data.frame com as colunas desejadas
+dados_precipitacao <- data.frame(
+  Estado = rep("RN", length(Precipitacao_filtrado)),  # Repetir "RN" com o mesmo comprimento da precipitação filtrada
+  Precipitacao = Precipitacao_filtrado
+)
+
+f3 = ggplot(dados_precipitacao) +
+  aes(y = dados_precipitacao$Estado, x = dados_precipitacao$Precipitacao) +
+  ylab("")+ xlab("Precipitação em milímetros (mm)") +
+  geom_boxplot(width = 0.7 , show.legend = F, fill = "orange", outlier.colour = "red", outlier.shape = 1) +
+  #geom_jitter(position = position_jitter(0), show.legend = F)+
+  labs(title = "Distribuição via Boxplot") +
+  scale_x_continuous(limits = c(0,0.6), breaks = seq(0,0.6,0.05))+
+  theme(axis.text.x = element_text(hjust = 1, size = 12),
+        axis.title.y = element_text(size = 12),
+         axis.title.x = element_text(size = 12))
+
+gridExtra::grid.arrange(f1,f2,f3, ncol = 3, nrow = 1)
+
+```
+---
+```{r, include=T, echo=F, menssage = F, warning=FALSE, out.width="100%", out.height = "100%", fig.width=15, fig.height=10, fig.align = 'center', fig.cap= "Figura 4: visualização das correlações"}
+dados_shape_RN_BDqueimadas_fit = dados_shape_RN_BDqueimadas[,c(8,9,12)] %>% as.data.frame()
+dados_shape_RN_BDKqueimadas_fit <- dados_shape_RN_BDqueimadas_fit  %>%  filter_all(all_vars(. != -999)) %>% na.omit() %>% as.data.frame()  ## Remove linhas onde qualquer coluna contém -999 e Remove linhas com valores NA
+
+colnames(dados_shape_RN_BDqueimadas_fit) = c("Precipitação", "Risco de Fogo", "Potência de Energia Liberada")
+
+Z = scale(dados_shape_RN_BDqueimadas_fit)
+R = cor(Z, method = "spearman")
+library(corrgram)
+corrgram(R, 
+         type = "cor",  # Tipo de gráfico como correlação
+         lower.panel = panel.cor,  # Exibir as correlações abaixo da diagonal
+         upper.panel = NULL,  # Não exibir nada acima da diagonal
+         main = "Correlação entre as Variáveis")  # Título do gráfico
+```
+---
+```{r, include=T, echo=F, menssage = F, warning=FALSE, out.width="100%", out.height = "100%", fig.width=15, fig.height=10, fig.align = 'center'}
+# Obter dados de municípios do Rio Grande do Norte: extraindo a borda
+dados_shape_RN_BDqueimadas1 = dados_shape_RN_BDqueimadas[, c(6,10,11,12)]
+
+# 2. Obter dados das municipios do Brasil
+municipios <- read_municipality(year = 2022)
+# 3. Filtrar municipios para o Rio Grande do Norte
+municipios_rn <-municipios[municipios$abbrev_state == "RN", ]  
+
+# Gráfico 1: Municípios do Rio Grande do Norte
+ggplot(data = municipios_rn) +
+  geom_sf(fill = "lightgreen", color = "black") +  # Municípios em azul claro
+  geom_point(data = dados_shape_RN_BDqueimadas1, 
+             aes(x = Longitude, y = Latitude, color = Bioma), 
+             size = 3, alpha = 0.8) +  # Dados de queimadas
+  labs(title = "Municípios do Rio Grande do Norte Dados de Queimadas",
+       subtitle = "Anos: 2023-2024",
+       x = "Longitude",
+       y = "Latitude") +
+   theme(axis.text.x = element_text(hjust = 1, size = 12),
+        axis.title.y = element_text(size = 12),
+         axis.title.x = element_text(size = 12)) +
+ annotation_scale(location = "bl", width_hint = 0.4, style = "bar", color = "black", fill = "darkgreen") + # Escala no canto inferior esquerdo
+  annotation_north_arrow(location = "br", which_north = "true", 
+                         style = north_arrow_fancy_orienteering)  # Rosa dos ventos no canto inferior direito
+```
+---
+```{r, include=T, echo=F, menssage = F, warning=FALSE, out.width="100%", out.height = "100%",fig.width=15, fig.height=10,  fig.align = 'center'}
+# 2. Obter dados das mesorregiões do Brasil
+mesorregioes <- read_meso_region(year = 2020)
+cores <- colorRampPalette(c("#DAA520", "green")) 
+# 3. Filtrar mesorregiões para o Rio Grande do Norte
+mesorregioes_rn <- mesorregioes[mesorregioes$abbrev_state == "RN", ]
+
+# Gráfico 2: Mesorregiões do Rio Grande do Norte
+ggplot(mesorregioes_rn) +
+  geom_sf(fill = cores(4), color = "black") +  # Mesorregiões com cores
+  geom_point(data = dados_shape_RN_BDqueimadas1, 
+             aes(x = Longitude, y = Latitude, color = Bioma), 
+             size = 3, alpha = 0.8) +
+  labs(title = "Mesorregiões do Rio Grande do Norte - Dados de Queimadas",
+       subtitle = "Anos: 2023-2024",
+       x = "Longitude",
+       y = "Latitude") +
+  theme(axis.text.x = element_text(hjust = 1, size = 12),
+        axis.title.y = element_text(size = 12),
+        axis.title.x = element_text(size = 12)) +
+  annotation_scale(location = "bl", width_hint = 0.4, style = "bar", color = "black", fill = "darkgreen") + # Escala no canto inferior esquerdo
+  annotation_north_arrow(location = "br", which_north = "true", 
+                         style = north_arrow_fancy_orienteering)  # Rosa dos ventos no canto inferior direito
+
+```
+---
+###Verificando dependência e Estimando a intensidade de Pontos
+```{r, include=F, echo = F, menssage = T}
+library(geobr)       # Para usar a função read_state()
+library(spatstat)    # Para criar objetos ppp e owin
+library(sf)          # Para manipular objetos espaciais
+
+
+estado_rn <- read_state(code_state = "RN", year = 2020)#Obter a borda do estado do Rio Grande do Norte
+estado_rn <- st_transform(estado_rn, crs = 31984)  # Projete o polígono do estado para um sistema de coordenadas planas (UTM Zona 24S) 31984 é o EPSG para UTM 24S
+
+dados_shape_RN_BDqueimadas_lat_long <- dados_shape_RN_BDqueimadas1[, c(2, 3)] # Extraia as coordenadas de latitude e longitude dos dados das queimadas
+
+pontos_sf <- st_as_sf(dados_shape_RN_BDqueimadas_lat_long, coords = c("Longitude", "Latitude"), crs = 4326) #Convertendo os dados de queimadas para um objeto `sf`, especificando as colunas de latitude e longitude
+
+pontos_sf <- st_transform(pontos_sf, crs = 31984) #Projetando os pontos para o mesmo sistema de coordenadas do estado (UTM 24S)
+
+estado_rn_owin <- as.owin(estado_rn) #Convertendo o polígono do estado do RN para uma janela `owin` para usá-lo no `ppp`
+
+coords <- st_coordinates(pontos_sf) #Extraindo as coordenadas transformadas dos pontos e crie o objeto `ppp`
+x <- coords[, "X"]
+y <- coords[, "Y"]
+
+Queimadas <- ppp(x, y, window = estado_rn_owin) #Criando o objeto `ppp` usando a janela `estado_rn_owin`
+
+```
+```{r, include=T, echo=F, menssage = F, warning=FALSE, out.width="100%", out.height = "100%",fig.width=15, fig.height=10,  fig.align = 'center'}
+plot(Queimadas, main = "Pontos de Queimadas no Estado do Rio Grande do Norte")
+legend_info <- c(
+"Total de Pontos: 258",
+"Intensidade Média: 0,00488 pontos/km²",
+"Área do Polígono 1: 26,6 km²",
+"Área do Polígono 2: 52.865,7 km²",
+"Área da Janela: 52.865,7 km²",
+"Frações da Área do Quadro: 55,1%"
+)
+
+# Adicionando a legenda ao gráfico
+legend("bottomleft", legend = legend_info, bty = "n", cex = 1.2, pch=7)
+
+#egend("bottomleft", legend = legend_info ,text.col = "black", col = c("darkblue", "darkred"), pch=7)
+```
+---
+```{r, include=T, echo=F, menssage = F, warning=FALSE, out.width="100%", out.height = "100%",fig.width=15, fig.height=10,  fig.align = 'center'}
+# Teste de Kolmogorov-Smirnov para completa aleatoriedade 
+#  espacial com com a coordenada x
+#par(mfrow = c(1,2))
+KS <- cdf.test(Queimadas, "x",test="ks")
+p_valor <- KS$p.value;
+Estatistica <- KS$statistic;
+plot(KS,main="Teste de Kolmogorov-Smirnov para Completa 
+         Aleatoriedade Espacial")
+legend("bottomright", legend = paste("p-valor ≈", p_valor %>% round(2), "\nEstatística:", Estatistica %>% round(2)),text.col = "black", col = c("darkblue", "darkred"), pch=7)
+```
+---
+
+```{r, include=T, echo=F, menssage = F, warning=FALSE, out.width="100%", out.height = "100%",fig.width=15, fig.height=10,  fig.align = 'center'}
+#savePlot('Fig4.png',type="png")
+#Teste de Cramer-Von Mises para completa aleatoriedade espacial com
+#com a coordenada x
+CVM <- cdf.test(Queimadas, "x", test="cvm")
+p_valor <- CVM$p.value
+Estatistica <- CVM$statistic;
+plot(CVM,main="Teste de Cramer-Von Mises para Completa
+      Aleatoriedade Espacial")
+legend("bottomright", legend = paste("p-valor ≈",p_valor %>% round(2), "\nEstatística:", Estatistica %>% round(2)),text.col = "black", col = c("darkblue", "darkred"), pch=7)
+
+#savePlot('Fig5.png',type="png")
+
+# Um poss?vel modelo para um processo de poisson n?o-homeg?neo
+# Lembrando que, apenas como exemplo, pois, neste caso, o banco 
+# de dados segue um comportamento da CAE, ou seja, n?o rejeitamos
+# a hip?tese nula da CAE.
+```
+---
+```{r, include=F, echo = F, menssage = T}
+# Ajustar os modelos usando a função ppm()
+modelo1 <- ppm(Queimadas, ~1)
+AICfit1 <- AIC(modelo1)
+BICfit1 <- BIC(modelo1)
+
+modelo2 <- ppm(Queimadas, ~x)
+AICfit2 <- AIC(modelo2)
+BICfit2 <- BIC(modelo2)
+
+modelo3 <- ppm(Queimadas, ~y)
+AICfit3 <- AIC(modelo3)
+BICfit3 <- BIC(modelo3)
+
+modelo4 <- ppm(Queimadas, ~cos(x) + cos(y))
+AICfit4 <- AIC(modelo4)
+BICfit4 <- BIC(modelo4)
+
+modelo5 <- ppm(Queimadas, ~poly(x, 2) + poly(y, 2))
+AICfit5 <- AIC(modelo5)
+BICfit5 <- BIC(modelo5)
+
+# Organizar os valores de AIC e BIC em um data frame com nomes de modelos
+TAB_AIC_E_BIC <- data.frame(
+  Model = c("fit1 (Intercepto)", "fit2 (x)", "fit3 (y)", 
+            "fit4 (cos(x) + cos(y))", "fit5 (poly(x, 2) + poly(y, 2))"),
+  AIC = c(AICfit1, AICfit2, AICfit3, AICfit4, AICfit5),
+  BIC = c(BICfit1, BICfit2, BICfit3, BICfit4, BICfit5)
+)
+
+# Gerar a tabela de AIC com knitr::kable
+knitr::kable(TAB_AIC_E_BIC, caption = "(AIC) e (BIC) para diferentes modelos")
+
+# Plotar o modelo 5
+plot(modelo5, main = "Estimando a área de queimadas via modelo de processos pontuais")
+
+```
+---
+```{r, include=T, echo=F, menssage = F, warning=F, out.width="100%", out.height = "100%",fig.width=15, fig.height=10,  fig.align = 'center'}
+plot(modelo5, main = "Estimando a aréa de queimadas via modelo de processos pontuais")
+```
+---
+```{r, include=T, echo=F, menssage = F, warning=F, out.width="100%", out.height = "100%",fig.width=15, fig.height=10,  fig.align = 'center'}
+#Ajuste da distribuição G
+Queimadas_1 <- ppp(Longitude, Latitude,  c(-38.7,-35), c(-6.91206,-4.83379))
+#par(mfrow=c(1,2))
+r <- seq(0,0.3,length=1000)
+G <- envelope(Queimadas_1, Gest, nsim = 999, r=r,correction="border", verbose = F , cex.lab = 3, cex.axis = 3, cex.main = 3)
+#plot(G, main = "Envelope da função G",xlab="Distãncia (quilometros)",  ylab="G(y)")
+plot(G$r, G$theo, main = iconv("Envelope da função G", to="UTF-8"), type="n",
+     xlab="Distãncia (quilometros)", ylab="G(y)")# ylim=c(min(G$lo, G$theo), max(G$hi, G$theo)))
+lines(G$r, G$theo,lty=3,col="blue")
+lines(G$r, G$hi, lty=2,col="red")
+lines(G$r, G$lo, lty=2,col="red") 
+lines(G$r,G$obs,lty=1, col="black")
+legend("bottomright", c("Distribuição Teórica","Distribuição Empírica",
+                        "Envelope Simulado"), pch=7, col=c("blue","black","red"))
+
+```
+---
+```{r, include=T, echo=F, menssage = F, warning=F, out.width="100%", out.height = "100%",fig.width=15, fig.height=10,  fig.align = 'center'}
+#title("Ajuste do variograma com diferentes função de correlação")
+#savePlot('Fig6.png',type="png")
+
+#Ajuste da distribuição K
+
+#ylim=c(0.0,0.28)
+#, xlim=c(0,0.16)
+#,  xlim=c(0,0.16), ylim=c(0.0,0.28)
+
+#par(mfrow=c(1,2))
+r <- seq(0,1,length=1000)
+L <- envelope(Queimadas, Lest, nsim = 999, r=r,correction="border", verbose = F)
+#plot(L, main = "Envelope da função K",xlab="Distãncia (quilometros)", ylab="K(y)")
+plot(L$r, L$theo, main = "Envelope da função K",type="n",
+     xlab="Distãncia (quilimetros)", ylab="K(y)")
+lines(L$r, L$theo,lty=3, col="blue")
+lines(L$r, L$hi,  lty=2, col="red")
+lines(L$r, L$lo,  lty=2, col="red") 
+lines(L$r, L$obs, lty=1, col="black")
+legend("bottomright", c("Distribuição Teórica","Distribuição Empírica",
+                        "Envelope Simulado"), pch=7, col=c("blue","black","red"))
+
+#savePlot('Fig7.png',type="png")
+```
+---
+```{r echo=F, fig.align=, fig.height=10, fig.width=15, warning=FALSE, include=T, menssage=F, out.height="100%", out.width="100%"}
+# density <- density(Queimadas)
+# plot(density, xlab="Distância (quilometros)", col=terrain.colors(200),
+#      ylab="Distância (quilometros)",use.marks=TRUE,
+#      main="Intensidade de pontos por unidade de Area")
+# 
+# plot(Queimadas, add=T,cex = 0.8,use.marks=TRUE, main = "Pontos de Queimadas no Estado do Rio Grande do Norte")
+```
+---
+###Conclusão
+
+- O estado do Rio Grande do Norte possui elevados casos de incendicio na maior parte da messoregião do Oeste potiguar, sendo marcada por um relevo variado, que inclui planaltos, chapadas e áreas de depressão. O solo é, em sua maioria,árido, com áreas de caatinga e cerrados. O clima predominante é semiárido, com uma estação seca prolongada onde possui temperaturas elevadas.
+
+- A Segunda maior concentração sendo o Leste portiguar onde é caracterizada por um litoral extenso, com praias famosas, como Ponta Negra, Genipabu e Tibau do Sul. Além das áreas costeiras, há terrenos de dunas, lagoas e vegetação de restinga.O clima na região é tropical, com temperaturas elevadas durante todo o ano. A umidade é geralmente alta, especialmente nas áreas costeiraa além das temperaturas são geralmente elevadas durante o ano são alguns fatores que influenciam a maior concentração de queimadas.
+
+
+---
+
+###Referências
+
+
+INSTITUTO NACIONAL DE PESQUISAS ESPACIAIS - INPE. TerraBrasilis: Dados de Queimadas. Disponível em: https://terrabrasilis.dpi.inpe.br/queimadas/bdqueimadas/#exportar-dados. Acesso em:  02 out. 2024.
+
+HENRY, L. rnaturalearth: Natural Earth Maps for R. Disponível em: https://cran.r-project.org/web/packages/rnaturalearth/vignettes/rnaturalearth.html. Acesso em: 02 out. 2024.
+
+R CORE TEAM. spatstat: Analyzing Spatial Point Patterns. Disponível em: https://cran.r-project.org/web/packages/spatstat/index.html. Acesso em: 02 out. 2024.
+
+WICKHAM, H. ggplot2: geom_bar. Disponível em: https://ggplot2.tidyverse.org/reference/geom_bar.html. Acesso em: 02 out. 2024.
+

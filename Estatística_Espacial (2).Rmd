@@ -1,0 +1,155 @@
+---
+title: "UNIVERSIDADE ESTADUAL DA PARAÍBA CAMPUS l CENTRO DE CIÊNCIAS E TECNOLOGIA DEPARTAMENTO DE ESTATÍSTICA CURSO DE ESTATÍSTICA"
+institute: 
+        - "Ánalise Espacial - Dados Estado do Rio Grande do Norte"
+author: 
+     - "Fabiano Florentino dos Santos" 
+     - "Prof. Ricardo Alves de Olinda "
+date: "CAMPINA GRANDE 04/08/24"
+encoding: "UTF-8"
+header-includes:
+    - \renewcommand{\rmdefault}{bch}
+    - \usepackage{tikz}
+    - \usepackage{multicolumn}
+    - \usetikzlibrary{positioning}
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightLines: true #realçar as linhas
+      countIncrementalSlides: false
+    css: ["chocolate-fonts" , "tamu"]
+editor_options: 
+  chunk_output_type: console
+---
+
+####Vamos carregar os principais pacotes 
+<div style="text-align: justify; text-indent: 20px">
+  <br>
+  library("readxl") -> ler os banco de dados, normalmente csv, xls, text....<br>
+  library("sp") -> análise de dados da área<br>
+  library("spdep") -> análise de dados da área<br>
+  library("classInt") -> rotinas para facilitar a divisão de dados em classes em vários critérios<br>
+  library("raster") -> leitura de shape e raster<br>
+  library("tmap") -> apresentação das principais estatísticas para dados espaciais<br>
+  library("RColorBrewer") -> usada para criar palhetas de cores nas visualizações de mapas<br>
+  library("sf") -> função para ler tipos de shapefiles
+  library("dplyr") -> #pacote usado para manipulações de tabelas
+</div>
+
+---
+```{r, include=F, menssage = T}
+#pacotes a serejm estalados
+library("readxl")
+library("sp"); #analise de dados da área
+library("spdep") #analise de dados da área
+library("classInt"); #rotinas para facilitar a divisão de dados em classes em vários críterios
+library("raster") #leitura de shape e raster
+library("tmap") #apresentação das principais estatística para dados espaciais
+library("RColorBrewer") #usada para criar palhetas de cores nas visualiazções de mapas
+library("sf") #função para ler tipos de shapefiles
+library("dplyr") #pacote usado para manipulações de tabelas
+library("ggplot2")
+```
+---
+```{r, include=T, menssage = T}
+dados_shape_RN <- read_excel("C:/Users/samsung/Desktop/dados_shape_RN.xlsx");print(na.omit(dados_shape_RN))
+```
+---
+```{r, include=T, menssage = T}
+#lendo os dados do shapefile
+shape_RN = st_read("C:/Users/samsung/Desktop/malha territorial/RN_Municipios_2022.shp")
+```
+---
+```{r, include=T, menssage = F, out.width="100%", out.height = "100%",fig.width=15, fig.height=10,  fig.align = 'center'}
+plot(st_geometry(shape_RN), main = "Mapa da paraíba", cex.main=2)
+```
+---
+```{r, include=T, menssage = T}
+head(attributes(shape_RN))
+dim(shape_RN)
+```
+---
+
+```{r, include=T, message=FALSE, echo= T}
+nomes_municipios = as.character(shape_RN$NM_MUN); nomes_municipios[1:60]
+```
+---
+```{r, include=T, message=FALSE, echo= T}
+nomes_municipios = as.character(shape_RN$NM_MUN); nomes_municipios[60:120]
+```
+---
+```{r, include=T, message=FALSE, echo= T}
+nomes_municipios = as.character(shape_RN$NM_MUN); nomes_municipios[120:67]
+```
+---
+#### Precisamos obter os dados refrente aos indicadores do município do Rio Grande do Norte
+
+```{r, include=T, menssage = T}
+knitr::opts_chunk$set(echo = FALSE)
+dados_shape_RN <- read_excel("C:/Users/samsung/Desktop/dados_shape_RN.xlsx"); dados_shape_RN
+
+shape_RN = merge(shape_RN, dados_shape_RN,  by.x = "CD_MUN", by.y = "ID") #juntar os dados do shape com indicadores ibge dos municípios
+print(shape_RN)
+```
+---
+#### Visualizando um mapa do atributo: Densidade demográfica,indicador de densidade demográfica do ano de 2022, algumas medidas resumo 
+
+```{r, include=T, menssage = T}
+#library("ggplot2")
+summary(as.numeric(shape_RN$`Densidade demográfica - hab/km² [2022]`))
+
+shape_RN$densidade_demografica = as.numeric(shape_RN$`Densidade demográfica - hab/km² [2022]`)
+
+#quebras <- pretty(range(shape_RN$densidade_demografica), n = nclass.Sturges(shape_RN$densidade_demografica))
+
+#ggplot(shape_RN, aes(x = shape_RN$densidade_demografica)) +
+#  geom_histogram(aes(y = after_stat(density)), fill = "#00FA9A", #binwidth = 1) +
+#   geom_smooth(method = "loess", color = "red", se = FALSE) +
+#  geom_density(col = "red") +
+#  ylab("densidade") +
+#  xlab("Densidade demográfica - hab/km² [2022]") +
+#  labs(title = "Histograma", subtitle = "") +
+ # scale_x_continuous(limits = c(0,3000), breaks = seq(0,3000, 100)) +
+#  theme_bw()
+```
+---
+```{r, include=T, menssage = T}
+hist(shape_RN$densidade_demografica, 
+     main = "Histograma dos Dados", 
+     xlab = "Valores", 
+     ylab = "Frequência", 
+     col = "lightblue", 
+     border = "black")
+lines(density(shape_RN$densidade_demografica), col = "red", lwd = 2)
+```
+---
+```{r, include=T, menssage = T}
+# Densidade demográfica hab/km² [2022]
+
+color1 = colorRampPalette(c("yellow","blue"))
+valor1 = color1(5)
+
+
+# tm_shape(shape_RN) + tm_polygons(n=5, style="quantile", border.col = "grey80", lwd = 1,
+#                                 col = "IDHM", palette= valor1) +
+# tm_legend(outside = TRUE, text.size = 1)  +
+# tm_layout(frame = TRUE)
+
+tm_shape(shape_RN) + 
+  tm_polygons(border.col = "grey80", lwd = 1.85,
+              col = "Densidade demográfica - hab/km² [2022]", 
+              breaks = c(6, 19, 30, 46, 75, 4488.03),  # Definindo as quebras manualmente
+              labels = c("6 - 19", "19 - 30", "30 - 46", "46 - 75", "75 - 4488.03"),  # Rótulos personalizados
+              palette = valor1) + 
+  tm_legend(outside = FALSE, title.size = 7) + 
+  tm_layout(frame = TRUE ,legend.title.size = 0.5)
+
+
+# #border=NA
+# tm_shape(shape_RN) + tm_polygons(n=4, style="quantile", border.col = "grey80", lwd = 0.5,
+#                                 col = "`Densidade demográfica - hab/km² [2022]`", palette="Reds") +
+#   tm_legend(outside = TRUE, text.size = .8)  +
+#   tm_layout(frame = FALSE)
+
+```

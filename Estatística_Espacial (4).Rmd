@@ -1,0 +1,372 @@
+---
+title: "UNIVERSIDADE ESTADUAL DA PARAÍBA CAMPUS l CENTRO DE CIÊNCIAS E TECNOLOGIA DEPARTAMENTO DE ESTATÍSTICA CURSO DE ESTATÍSTICA"
+institute: 
+        - "Ánalise Espacial - Densidade Demográfica do Estado do Rio Grande do Norte"
+author: 
+     - "Fabiano Florentino dos Santos" 
+     - "Prof. Ricardo Alves de Olinda "
+date: "CAMPINA GRANDE 23/09/24"
+encoding: "UTF-8"
+header-includes:
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightLines: true #realçar as linhas
+      countIncrementalSlides: false
+    css: ["chocolate-fonts" , "tamu"]
+editor_options: 
+  chunk_output_type: console
+---
+```{r, include=F, menssage = F, echo=FALSE}
+#pacotes a serejm estalados
+suppressPackageStartupMessages(library("readxl"))
+library("sp"); #analise de dados da área
+library("spdep") #analise de dados da área
+library("classInt"); #rotinas para facilitar a divisão de dados em classes em vários críterios
+library("raster") #leitura de shape e raster
+suppressPackageStartupMessages(library("tmap")) #apresentação das principais estatística para dados espaciais
+library("RColorBrewer") #usada para criar palhetas de cores nas visualiazções de mapas
+library("sf") #função para ler tipos de shapefiles
+library("dplyr") #pacote usado para manipulações de tabelas
+library("ggplot2")
+library("Hmisc")
+library("knitr")
+library("kableExtra")
+```
+### Pequena introdução do que é o indicador de densidade demográfica
+
+- a densidade demográfica corresponde à distribuição da população em uma determinada área. Essa medida representa, portanto, uma média entre a área de um determinado lugar e o total de habitantes desse lugar.
+
+- ela permite analisar a população de um determinado lugar, como ela é distribuída e quais são os fatores que influenciam os níveis de concentração de indivíduos em uma mesma área."
+
+#### O calculo é dado da seguinte forma:
+$$\text{Densidade Demográfica} = \frac{\text{Total de habitantes}}{Àrea}$$
+
+- O estudo da população relativa ou densidade demográfico como também conhecida é de suma importância para entender a dinâmica populacional de um determinado lugar, pois partir dela, podemos averiguar se uma área é pouco ou muito povoada ou se é pouco ou muito populosa
+
+---
+### Dados de alguns indicadores do Rio Grande do Norte
+```{r, include=T, echo = F, menssage = F, warning=FALSE}
+# Ler os dados do arquivo Excel
+dados_shape_RN <- read_excel("C:/Users/samsung/Desktop/dados_Shape_RN.xlsx"); 
+# Criar a tabela com kableExtra e ajustar a largura
+kable(dados_shape_RN, format = "html", caption = "Dados de Shape RN") %>% kable_styling(
+    bootstrap_options = c("striped", "hover"), font_size = 12, full_width = F, position = "center") %>%
+  scroll_box(width = "100%", height = "400px") # Ajustar o tamanho da visualização
+```
+---
+```{r, include=F, echo = F, menssage = T}
+#lendo os dados do shapefile
+shape_RN = st_read("C:/Users/samsung/Desktop/malha_territorial/RN_Municipios_2022.shp")
+MesoRN <- st_read("C:/Users/samsung/Desktop/RN_Mesorregioes_2022")
+```
+```{r, include=T, echo = F, menssage = F, warning=FALSE, out.width="100%", out.height = "100%",fig.width=15, fig.height=10,  fig.align = 'center'}
+plot(st_geometry(shape_RN), main = "Mapa dos municipios do Rio Grande do Norte", cex.main = 2, col = "grey70",
+     border = "red")  
+centroids <- st_coordinates(st_centroid(shape_RN))
+#text(centroids, 
+#     labels = shape_RN$NM_MUN,  # Nome dos municípios
+#    cex = 0.4,  # Tamanho do texto
+#     col = "black")  # Cor do texto   
+```
+---
+```{r, include=T, echo =F,menssage = F, warning=FALSE, out.width="100%", out.height = "100%",fig.width=15, fig.height=10,  fig.align = 'center'}
+plot(st_geometry(MesoRN), main = "Mapa das messoregiões do Rio Grande do Norte", cex.main = 2, col = "grey70",
+     border = "red")  
+centroids <- st_coordinates(st_centroid(MesoRN))
+text(centroids, 
+     labels = MesoRN$NM_MESO,  # Nome dos municípios
+     cex = 1,  # Tamanho do texto
+     col = "black")  # Cor do texto     
+```
+---
+```{r, include=F, menssage = T, echo = T}
+# Extrair as colunas específicas
+CD_MUN <- shape_RN$CD_MUN; NM_MUN <- shape_RN$NM_MUN; SIGLA_UF <-shape_RN$SIGLA_UF; AREA_KM2 <- shape_RN$AREA_KM2
+# Criar o data.frame com essas colunas
+atributos_df <- data.frame(CD_MUN = CD_MUN, NM_MUN = NM_MUN, SIGLA_UF = SIGLA_UF, AREA_KM2 = AREA_KM2)
+# Exibir os atributos com knitr::kable
+knitr::kable(atributos_df, caption = "Atributos Selecionados de shape_RN")
+```
+```{r, include=T, echo = F, menssage = T,warning=FALSE}
+Shape_RN = merge(shape_RN, dados_shape_RN,  by.x = "CD_MUN", by.y = "ID"); #juntar os dados do shape com 
+Shape_RN$densidade_demografica = as.numeric(Shape_RN$densidade_demografica)
+```
+
+###O indicador de densidade demográfica do ano de 2022, algumas medidas resumo 
+
+```{r, include=T, menssage = F, warning=F, echo=FALSE}
+suppressPackageStartupMessages(library(psych))
+
+# Supondo que Shape_RN$densidade_demografica seja o vetor de dados para análise
+AD <- describe(Shape_RN$densidade_demografica)
+
+# Renomeando as colunas do dataframe AD
+AD$Variável <- AD$vars
+AD$Média <- AD$mean
+AD$Variância <- AD$sd
+AD$Mediana <- AD$median
+AD$Média_Truq <- AD$trimmed
+AD$Kurtose <- AD$kurtosis
+AD$Intervalo <- AD$range
+AD$Coef_assim <- AD$skew
+AD$Desv_abs <- AD$mad
+AD$Erro_padrao <- AD$se
+
+# Selecionar apenas as colunas necessárias
+AD_df <- AD[, c("Variável", "Média", "Variância", "Mediana", "Média_Truq", "Kurtose", "Intervalo", "Coef_assim", "Desv_abs", "Erro_padrao")]
+
+# Transpor o dataframe para exibir como uma tabela
+AD_df_transposed <- as.data.frame(t(AD_df))
+
+# Exibir a tabela formatada com knitr::kable
+knitr::kable(AD_df_transposed, 
+             caption = "Algumas medidas resumo da variável densidade demográfica")
+```
+---
+```{r, include=T, echo = F, warning=FALSE,menssage = T, out.width="100%", out.height = "100%",fig.width=15, fig.height=10,  fig.align = 'center'}
+hist(Shape_RN$densidade_demografica, 
+     main = "Histograma da variável densidade demográfica", 
+     xlab = "Valores", 
+     ylab = "Frequência", 
+     col = "lightblue", 
+     border = "black")
+lines(density(Shape_RN$densidade_demografica), col = "red", lwd = 2)
+```
+---
+```{r, include=T, echo = F, warning=FALSE,menssage = T, out.width="100%", out.height = "100%",fig.width=15, fig.height=10,  fig.align = 'center'}
+
+tmap_mode("view")
+# Definindo a paleta de cores
+color4 <- colorRampPalette(c("yellow", "darkblue"))
+valor4 <- color4(5)  # Número de cores no intervalo
+
+
+# Criando o mapa
+tm_shape(Shape_RN) + 
+  tm_fill("densidade_demografica",
+          palette = valor4,
+          id = "nome",
+          popup.vars = c("densidade_demografica"),
+          style = "fixed",
+          labels = c("6 - 19", "19 - 30", "30 - 46", "46 - 75", "75 - 4488.03"),
+          breaks = c(6, 19, 30, 46, 75, 4488.03),
+          title = "Densidade Demográfica") + 
+  tm_polygons(border.col = "black", lwd = 0.8,
+              col = "densidade_demografica") + 
+  tm_text("NM_MUN", size = 0.7, col = "darkorange", shadow = TRUE) +
+  tm_legend(outside = TRUE, title.size = 1, text.size = 0.8) +
+  tm_layout(frame = TRUE)
+```
+---
+
+
+## Índice de Moran Geral
+
+O índice de Moran geral é dado pela fórmula:
+
+$$I = \frac{n \sum_{i=1}^{n} \sum_{j=1}^{n} w_{ij}(y_i - \bar{y})(y_j - \bar{y})}{\sum_{i=1}^{n} \sum_{j=1}^{n} w_{ij} \sum_{i=1}^{n} (y_i - \bar{y})^2}$$
+
+onde:
+
+- $n$ corresponde ao número de áreas,
+- $y_i$ é o valor do atributo considerado na área $i$,
+- $\bar{y}$ representa o valor médio do atributo na região de estudo,
+- $w_{ij}$ são os pesos atribuídos conforme a conexão entre as áreas $i$ e $j$.
+---
+```{r, include=F, menssage = F, warning=FALSE}
+require(spdep)
+
+ShapeRN.nb1 <- poly2nb(Shape_RN, queen=TRUE)
+
+class(ShapeRN.nb1)
+ShapeRN.nb1[[1]]
+ShapeRN.nb1[[2]]
+#
+
+#########################################################
+
+moran <- moran.plot(as.numeric(Shape_RN$densidade_demografica), xlim=c(0.50,0.77),
+                    listw = nb2listw(ShapeRN.nb1, style = "W"))
+
+
+#########################################################
+# OBS: Outros tipos de vizinhan?as podem ser calculados:
+#########################################################
+
+ShapeRN.nb1[[50]]
+
+ShapeRN.nb1[[6]]
+Shape_RN[ShapeRN.nb1[[6]],5]
+
+class(ShapeRN.nb1)
+
+# 
+vizinhanca = nb2listw(ShapeRN.nb1, style="W",
+                      zero.policy=TRUE)
+vizinhanca
+
+```
+Hipótese nula (H0): Não há autocorrelação espacial $I = 0$ (distribuídos de forma aleatória)
+
+Hipótese alternativa (H1): Existe autocorrelação espacial $I \neq 0$(apresentam um padrão espacial, agrupados ou dispersos)
+```{r, include=T, echo  = F, menssage = F, warning=FALSE}
+### Calculando o indice de Moran global
+
+# Executar o teste de Moran
+Mglobal1 <- moran.test(Shape_RN$densidade_demografica, listw = nb2listw(ShapeRN.nb1))
+
+# Criar um data.frame com os resultados
+resultado_df <- data.frame(
+  Estatistica = Mglobal1$statistic,
+  p_valor = Mglobal1$p.value,
+  Estimativa = Mglobal1$estimate[1],
+  Variancia =   0.0007941911 )
+
+
+colnames(resultado_df) = c("Estatística", "p-valor", "Estimativa de Moran's I", "Variância")
+row.names(resultado_df) = c("Resultados")
+
+# Exibir os resultados com knitr::kable()
+knitr::kable(t(resultado_df), caption = "Resultados do Teste de Moran")    
+```
+
+```{r, include=T, menssage = T, warning=FALSE , echo = F,warning = FALSE, out.width="100%", out.height = "100%",fig.width=15, fig.height=10,  fig.align = 'center'}
+Shape_RN$lag <- lag.listw(vizinhanca, as.matrix(Shape_RN$densidade_demografica))
+#M <- lm(lag ~ Shape_RN$IDHM_2010, Shape_RN)
+# Plot the data
+#plot(lag ~ IDHM_2010, Shape_RN, pch=21, asp=1, las=1, col = "grey40", bg="grey80")
+#abline(M, col="blue") # Add the regression line from model M
+#abline(v = mean(Shape_RN$IDHM_2010), lty=3, col = "grey80")
+#abline(h = mean(Shape_RN$IDHM_2010), lty=3, col = "grey80")
+
+```
+$obs)$ isso sugere que temos indicíos para acreditar que a autocorrelação espacial positiva valores similares estão próximos, ou seja , municípios com densidades demográficas similiares;
+
+$obs)$ teste de Moran Local, pode ser usado para identificar autocorrelação espacial dos municípios apresentam maior infleuncia sobre os outros.
+---
+```{r, include=F, menssage = F}
+#MC<- moran.mc(Shape_RN$densidade_demografica, vizinhanca, nsim = 999)
+#visualizando os resultados (including pseudo p-value)
+#knitr::kable(MC)
+```
+```{r, include=F, menssage = F, warning=F, echo=FALSE}
+# Plot the distribution (note that this is a density plot instead of a histogram)
+#plot(MC, main="", las=1)
+
+```
+
+```{r, include=T, menssage = T}
+Shape_RN.mloc1 <- localmoran(as.vector(Shape_RN$densidade_demografica), listw=vizinhanca,
+                            zero.policy=T, alternative = "two.sided")
+head(Shape_RN.mloc1)
+```
+- Ii: O valor do índice Local Moran's I para cada área.
+- E.Ii: O valor esperado de Ii sob a hipótese nula (ausência de autocorrelação espacial).
+- Var.Ii: A variância do índice Ii.
+- Z.Ii: O valor Z para o teste (Z-score), que é a razão entre o valor observado de Ii e seu desvio padrão.
+- Pr(): O p-valor associado ao Z-score, indicando a significância da autocorrelação espacial.
+---
+```{r, include=F, echo = F, warning=FALSE,menssage = T, out.width="100%", out.height = "100%",fig.width=15, fig.height=10,  fig.align = 'center'}
+
+# Adicionar os valores-p ao objeto Shape_RN
+p_values <- Shape_RN.mloc1[, "Pr(z != E(Ii))"]
+Shape_RN$p_value <- p_values
+
+# Filtrar Shape_RN para incluir apenas áreas onde p < 0.05
+Shape_RN_filtered <- subset(Shape_RN, p_value < 0.05)
+
+# Definir uma paleta de cores, indo de vermelho a branco
+color5 <- colorRampPalette(c("red", "darkred"))
+valor5 <- color5(5)  # 5 cores no intervalo
+
+# Definir os intervalos de p-value para a legenda
+breaks_p <- seq(0, 0.05, 0.01)
+
+tmap_mode("view")
+
+# Criar o mapa destacando os municípios com p < 0.05
+tm_shape(Shape_RN_filtered) + 
+  tm_fill("p_value",                      # Atributo para preencher as regiões
+          style = "fixed",                # Estilo de categorização fixa
+          breaks = breaks_p,              # Intervalos de classificação ajustados
+          palette = valor5,               # Paleta de cores
+          title = "P-Valor",              # Título da legenda
+          colorNA = "yellow4") +           # Cor para valores NA
+  tm_borders(col = "black", lwd = 0.8) +  # Bordas dos polígonos
+  tm_text("NM_MUN", size = 1.5, col = "black", shadow = TRUE) + # Nomes dos municípios
+  tm_layout(frame = TRUE, 
+            legend.outside = TRUE, 
+            legend.title.size = 1, 
+            legend.text.size = 0.8)       # Layout da legenda e do mapa
+
+```
+```{r, include=T, echo=F, message=F, out.width="100%", out.height = "100%",  fig.align = 'left'}
+knitr::include_graphics("appppppppp_files/img/sig.png")
+```
+$obs)$ Para os municípios onde o p-valor é menor que 0.05, indicando uma autocorrelação espacial significativa. Isso sugere que, para essas localizações, a densidade demográfica está mais fortemente agrupada ou dispersa do que seria esperado por acaso.
+---
+```{r, include=T, echo =FALSE,warning=FALSE,menssage = F, out.width="100%", out.height = "100%",fig.width=15, fig.height=10,  fig.align = 'center'}
+# Ordenar e selecionar os 10 municípios com menor densidade demográfica
+bottom_10_municipios <- Shape_RN %>%
+  as.data.frame() %>%
+  arrange(densidade_demografica) %>%
+  head(10)
+
+# Gráfico de barras com ajuste da escala do eixo y
+ggplot(bottom_10_municipios, aes(x = reorder(NM_MUN, densidade_demografica), y = densidade_demografica)) +
+  geom_bar(stat = "identity", fill = "yellow") +
+  labs(title = "Top 10 Municípios com Menor Densidade Demográfica",
+       x = "Município",
+       y = "Densidade Demográfica hab/km²") +
+  scale_y_continuous(labels = scales::comma,
+                     limits = c(0, max(bottom_10_municipios$densidade_demografica) * 1.1),
+                     breaks = seq(0, max(bottom_10_municipios$densidade_demografica) * 1.1, by = 3)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12),
+        axis.title.y = element_text(size = 14))
+```
+---
+```{r, include=T, echo =FALSE,warning=FALSE,menssage = F, out.width="100%", out.height = "100%",fig.width=15, fig.height=10,  fig.align = 'center'}
+library(dplyr)
+
+# Ordenar e selecionar os 10 municípios com maior densidade demográfica
+top_10_municipios <- Shape_RN %>%
+  as.data.frame() %>%
+  arrange(desc(densidade_demografica)) %>%
+  head(10)
+
+ggplot(top_10_municipios, aes(x = factor(NM_MUN, levels = NM_MUN), y = densidade_demografica)) +
+  geom_bar(stat = "identity", fill = "darkblue") +
+  labs(title = "Top 10 Municípios com Maior Densidade Demográfica",
+       x = "Município",
+       y = "Densidade Demográfica  hab/km² ") +
+  scale_y_continuous(labels = scales::comma, 
+                     limits = c(0, max(top_10_municipios$densidade_demografica) * 1.1), 
+                     breaks = seq(0, max(top_10_municipios$densidade_demografica) * 1.1, by = 500)) + # Ajuste do intervalo de breaks
+ theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12),
+        axis.title.y = element_text(size = 14))
+```
+---
+###Conclusão
+
+#### Top 10 Municípios com Maior Densidade Demográfica:
+
+Os municípios com maior densidade demográfica geralmente têm uma infraestrutura mais desenvolvida para suportar uma alta densidade populacional e podem enfrentar desafios relacionados à urbanização, como congestionamento e pressão sobre serviços públicos.
+Municípios com valores muito altos (como 4488.03 hab/km²) são notáveis por suas concentrações extremas de população, possivelmente indicando áreas urbanas ou metropolitanas densamente povoadas.
+
+#### Top 10 Municípios com Menor Densidade Demográfica:
+
+Os municípios com menor densidade demográfica podem ter vastas áreas de terra com menos desenvolvimento urbano ou maior distância entre centros populacionais.Os menores valores (como 6.55 hab/km²) refletem uma população muito dispersa, o que pode implicar menos infraestrutura e serviços urbanos em comparação com municípios de alta densidade.
+
+---
+
+###Referências
+
+BRASIL ESCOLA. Densidade demográfica. Brasil Escola, 2024. Disponível em: https://brasilescola.uol.com.br/geografia/densidade-demografica.htm. Acesso em: 11 set. 2024
+
+MUNDO EDUCAÇÃO. Densidade demográfica. Mundo Educação, 2024. Disponível em: https://mundoeducacao.uol.com.br/geografia/densidade-demografica.htm. Acesso em: 11 set. 2024.
+
+TODA MATÉRIA. Densidade demográfica. *Toda Matéria*. Disponível em: https://www.todamateria.com.br/densidade-demografica/. Acesso em: 11 set. 2024.
