@@ -119,7 +119,7 @@ espacial aleatório — $K(h)$, sendo que se estamos completamente aleátorio $K
 
 - $Obs_2$ uma forma de comparar a estimativa K de um conjunto de dados observados com $h\pi^2$ seria plotar a função $\hat L(h)$ definida como $\hat L(h) = \sqrt\frac{\hat K(h)-h}{\pi}$. A abordagem é similar à do vizinho mais próximo, pode ser feita para se estimar a significância dos desvios da distribuição $\hat L(h)$ em relação à condição de aleatoriedade (CSR)
   
-
+  
 ###Vamos carregar os principais pacotes que serão usados para análise espacial 
 ```{r, include=T, menssage = F, warning=F, echo = T}
 #pacotes a serejm estalados
@@ -303,7 +303,7 @@ RiscoFogo_filtrado <- dados_shape_RN_BDqueimadas$RiscoFogo %>%
   na.omit() %>%
   subset(. >= 0 & . <= 1) %>%
   as.numeric()
-  
+
 dados_RiscoFogo <- data.frame(
   Estado = rep("RN", length(RiscoFogo_filtrado)),
   RiscoFogo = RiscoFogo_filtrado
